@@ -43,6 +43,7 @@ class PurchaseModel {
   final String purchaseNumber;
   final String? supplierInvoiceNumber;
   final int? supplierId;
+  final String? supplierName;
   final String purchaseDate;
   final double subtotal;
   final double taxAmount;
@@ -60,6 +61,7 @@ class PurchaseModel {
     required this.purchaseNumber,
     this.supplierInvoiceNumber,
     this.supplierId,
+    this.supplierName,
     required this.purchaseDate,
     required this.subtotal,
     required this.taxAmount,
@@ -70,6 +72,8 @@ class PurchaseModel {
     required this.status,
     required this.items,
   });
+
+  double get totalAmount => grandTotal;
 
   factory PurchaseModel.fromJson(Map<String, dynamic> json) {
     var rawItems = json['items'] as List<dynamic>? ?? [];
@@ -82,6 +86,8 @@ class PurchaseModel {
       purchaseNumber: json['purchase_number'] ?? '',
       supplierInvoiceNumber: json['supplier_invoice_number'],
       supplierId: json['supplier_id'],
+      supplierName: json['supplier_name']?.toString() ??
+          (json['supplier'] is Map ? json['supplier']['name']?.toString() : null),
       purchaseDate: json['purchase_date'] ?? '',
       subtotal: (json['subtotal'] as num?)?.toDouble() ?? 0.0,
       taxAmount: (json['tax_amount'] as num?)?.toDouble() ?? 0.0,

@@ -7,7 +7,7 @@ import '../providers/report_provider.dart';
 import '06_quick_billing_pos_screen.dart';
 import '08_sales_history_screen.dart';
 import '11_inventory_stock_alerts_screen.dart';
-import '14_customer_khata_screen.dart';
+import '13_customer_management_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -189,7 +189,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: AppColors.warning,
                       onTap: () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const CustomerKhataScreen()),
+                          MaterialPageRoute(builder: (_) => const CustomerManagementScreen()),
                         );
                       },
                     ),
@@ -223,7 +223,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Row(
-                        mainAxisAlignment: MainAxisAlignment.between,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("7-Day Sales Trend", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                           Text("Daily revenue in ₹", style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
@@ -311,7 +311,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.between,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(title, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
                   Icon(icon, size: 18, color: color),

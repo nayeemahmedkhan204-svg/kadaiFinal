@@ -11,6 +11,7 @@ class ProductModel {
   final double purchaseCost;
   final double sellingPrice;
   final double? wholesalePrice;
+  final double? mrp;
   final double gstRate;
   final String? hsnCode;
   final bool isTaxInclusive;
@@ -31,6 +32,7 @@ class ProductModel {
     required this.purchaseCost,
     required this.sellingPrice,
     this.wholesalePrice,
+    this.mrp,
     required this.gstRate,
     this.hsnCode,
     required this.isTaxInclusive,
@@ -42,6 +44,7 @@ class ProductModel {
   });
 
   bool get isLowStock => currentStock <= minStockThreshold;
+  double get taxRate => gstRate;
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
@@ -55,6 +58,7 @@ class ProductModel {
       purchaseCost: (json['purchase_cost'] as num?)?.toDouble() ?? 0.0,
       sellingPrice: (json['selling_price'] as num?)?.toDouble() ?? 0.0,
       wholesalePrice: (json['wholesale_price'] as num?)?.toDouble(),
+      mrp: (json['mrp'] as num?)?.toDouble(),
       gstRate: (json['gst_rate'] as num?)?.toDouble() ?? 0.0,
       hsnCode: json['hsn_code'],
       isTaxInclusive: json['is_tax_inclusive'] == 1 || json['is_tax_inclusive'] == true,
@@ -78,6 +82,7 @@ class ProductModel {
       'purchase_cost': purchaseCost,
       'selling_price': sellingPrice,
       'wholesale_price': wholesalePrice,
+      'mrp': mrp,
       'gst_rate': gstRate,
       'hsn_code': hsnCode,
       'is_tax_inclusive': isTaxInclusive,

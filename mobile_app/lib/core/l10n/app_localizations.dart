@@ -32,6 +32,8 @@ class AppLocalizations {
     return _strings[key] ?? key;
   }
 
+  String get products => translate('products');
+
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 }

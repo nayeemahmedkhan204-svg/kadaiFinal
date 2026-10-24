@@ -11,10 +11,13 @@ class SyncProvider extends ChangeNotifier {
   int _pendingCount = 0;
   bool _isSyncing = false;
   String? _syncMessage;
+  DateTime? _lastSyncTime;
 
   int get pendingCount => _pendingCount;
   bool get isSyncing => _isSyncing;
   String? get syncMessage => _syncMessage;
+  DateTime? get lastSyncTime => _lastSyncTime;
+  bool get hasPendingSync => _pendingCount > 0;
 
   Future<void> checkPending(int businessId) async {
     final pending = await _db.getPendingInvoices(businessId);
@@ -63,6 +66,7 @@ class SyncProvider extends ChangeNotifier {
       await checkPending(businessId);
       _isSyncing = false;
       _syncMessage = 'Sync completed successfully.';
+      _lastSyncTime = DateTime.now();
       notifyListeners();
       return true;
     } catch (e) {

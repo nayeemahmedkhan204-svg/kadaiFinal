@@ -177,7 +177,7 @@ class _CustomerKhataScreenState extends State<CustomerKhataScreen> {
                       children: [
                         Text(_customer.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 2),
-                        Text(_customer.phone, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                        Text(_customer.phone ?? '', style: const TextStyle(color: Colors.white70, fontSize: 13)),
                       ],
                     ),
                     Column(
