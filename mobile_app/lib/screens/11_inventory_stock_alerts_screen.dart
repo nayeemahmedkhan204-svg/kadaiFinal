@@ -207,7 +207,7 @@ class _InventoryStockAlertsScreenState extends State<InventoryStockAlertsScreen>
                             Icon(Icons.check_circle_outline, size: 64, color: Colors.green.shade400),
                             const SizedBox(height: 12),
                             const Text('Inventory levels are healthy!',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black800)),
+                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
                             const SizedBox(height: 4),
                             Text('All products have stock above minimum threshold.',
                                 style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),

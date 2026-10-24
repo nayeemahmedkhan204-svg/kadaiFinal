@@ -100,7 +100,7 @@ class InvoicePreviewScreen extends StatelessWidget {
 
                     // Invoice Metadata
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.between,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Bill No: ${invoice.invoiceNumber}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                         Text("Date: ${invoice.invoiceDate}", style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
@@ -108,7 +108,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.between,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Customer: ${invoice.customerName}", style: const TextStyle(fontSize: 12)),
                         Text("Mode: ${invoice.paymentMethod.toUpperCase()}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary)),
@@ -168,7 +168,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                     const Divider(thickness: 2),
 
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.between,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         const Text("GRAND TOTAL", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         Text(
@@ -181,14 +181,14 @@ class InvoicePreviewScreen extends StatelessWidget {
                     if (invoice.balanceDue > 0) ...[
                       const SizedBox(height: 6),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.between,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text("Paid Amount:", style: TextStyle(fontSize: 13)),
                           Text("₹${invoice.paidAmount.toStringAsFixed(2)}", style: const TextStyle(fontSize: 13)),
                         ],
                       ),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.between,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text("Balance Due (Khata):", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.error)),
                           Text("₹${invoice.balanceDue.toStringAsFixed(2)}",
@@ -208,7 +208,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                         size: 160.0,
                       ),
                       const SizedBox(height: 4),
-                      Text(upiVpa, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                      Text(upiVpa ?? '', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                     ],
 
                     const SizedBox(height: 16),
@@ -261,7 +261,7 @@ class InvoicePreviewScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.between,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
           Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
@@ -290,7 +290,7 @@ class InvoicePreviewScreen extends StatelessWidget {
                 pw.Center(child: pw.Text('GSTIN: ${business!.gstin!}', style: const pw.TextStyle(fontSize: 10))),
               pw.Divider(),
               pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.between,
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text('Invoice No: ${invoice.invoiceNumber}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
                   pw.Text('Date: ${invoice.invoiceDate}'),

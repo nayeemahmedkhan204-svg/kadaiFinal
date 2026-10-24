@@ -32,6 +32,10 @@ class ApiEndpoints {
   static const String customers = '/v1/customers';
   static String customerDetails(int id) => '/v1/customers/$id';
   static String customerPayment(int id) => '/v1/customers/$id/payment';
+  static String customerLedger(int id) => '/v1/customers/$id/ledger';
+
+  // Payments
+  static const String payments = '/v1/payments';
 
   // Suppliers & Purchases
   static const String suppliers = '/v1/suppliers';
@@ -62,4 +66,6 @@ class ApiEndpoints {
   // Subscription
   static const String subscriptionCurrent = '/v1/subscription/current';
   static const String subscriptionSubscribe = '/v1/subscription/subscribe';
+  static const String subscriptionPlans = plans;
+  static const String subscribePlan = subscriptionSubscribe;
 }

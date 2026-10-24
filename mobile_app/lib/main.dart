@@ -85,7 +85,7 @@ class _KadaiKhataAppState extends State<KadaiKhataApp> {
           Locale('ta', 'IN'),
         ],
         localizationsDelegates: const [
-          AppLocalizationsDelegate(),
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
