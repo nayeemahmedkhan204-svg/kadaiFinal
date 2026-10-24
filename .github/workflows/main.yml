@@ -1,27 +1,51 @@
 name: Build APK
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.24.5'
           channel: 'stable'
-      - name: Build APK
+          cache: true
+
+      - name: Prepare Android project
+        working-directory: mobile_app
         run: |
-          cd mobile_app
           flutter config --no-analytics
           flutter create . --platforms=android --org com.kadaikhata
+          # AGP 8 ignores/complains about package= in the manifest (namespace is set in build.gradle)
+          sed -i 's/ package="[^"]*"//' android/app/src/main/AndroidManifest.xml
           flutter pub get
-          flutter build apk --release --no-tree-shake-icons
+
+      - name: Patch old plugins that have no namespace (AGP 8 fix)
+        run: |
+          for f in $(find "$HOME/.pub-cache" -path '*blue_thermal_printer*/android/build.gradle'); do
+            if ! grep -q "namespace" "$f"; then
+              sed -i "/^android {/a\    namespace 'id.kakzaki.blue_thermal_printer'" "$f"
+              echo "Patched $f"
+            fi
+          done
+
+      - name: Build release APK
+        working-directory: mobile_app
+        run: flutter build apk --release --no-tree-shake-icons
+
       - uses: actions/upload-artifact@v4
         with:
           name: kadaikhata-apk
-          path: mobile_app/build/app/outputs/flutter-apk/*.apk
+          path: mobile_app/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14
