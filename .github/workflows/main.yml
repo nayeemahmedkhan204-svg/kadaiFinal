@@ -40,6 +40,14 @@ jobs:
             fi
           done
 
+      - name: Fix Dart compile errors
+        working-directory: mobile_app
+        run: |
+          # MainAxisAlignment.between does not exist; the correct name is spaceBetween
+          grep -rl "MainAxisAlignment\.between" lib | xargs sed -i 's/MainAxisAlignment\.between/MainAxisAlignment.spaceBetween/g'
+          # upiVpa is String? but Text() needs a non-null String
+          sed -i 's/Text(upiVpa, /Text(upiVpa ?? "", /' lib/screens/07_invoice_preview_screen.dart
+
       - name: Build release APK
         working-directory: mobile_app
         run: flutter build apk --release --no-tree-shake-icons
