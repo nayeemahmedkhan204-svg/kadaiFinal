@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/app_colors.dart';
+import '../core/database/app_database.dart';
+import '../core/network/api_client.dart';
+import '../models/business_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/business_provider.dart';
+import '../providers/customer_provider.dart';
+import '../providers/product_provider.dart';
 import 'main_navigation_screen.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -53,7 +59,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
 
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter email/phone and password')),
+        const SnackBar(content: Text('Please enter email and password')),
       );
       return;
     }
@@ -72,7 +78,14 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
       );
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(auth.errorMessage ?? 'Login failed')),
+        SnackBar(
+          content: Text(auth.errorMessage ?? 'Connection timeout. Check Server URL or use Offline Mode.'),
+          action: SnackBarAction(
+            label: 'Offline Mode',
+            textColor: Colors.amber,
+            onPressed: _handleOfflineMode,
+          ),
+        ),
       );
     }
   }
@@ -117,20 +130,212 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
     }
   }
 
+  void _handleOfflineMode() async {
+    final businessProvider = Provider.of<BusinessProvider>(context, listen: false);
+    final productProvider = Provider.of<ProductProvider>(context, listen: false);
+
+    // Pre-populate demo grocery products in phone's SQLite DB if empty
+    final db = AppDatabase();
+    final cached = await db.getCachedProducts();
+    if (cached.isEmpty) {
+      await db.cacheProducts([
+        {
+          'id': 1,
+          'business_id': 1,
+          'category_id': 1,
+          'name': 'Ponni Boiled Rice 25kg',
+          'sku': 'RICE-PONNI-25',
+          'barcode': '8901234001',
+          'unit': 'BAG',
+          'purchase_cost': 1200.0,
+          'selling_price': 1350.0,
+          'mrp': 1400.0,
+          'tax_rate': 0.0,
+          'hsn_code': '1006',
+          'current_stock': 40.0,
+          'min_stock_threshold': 5.0,
+          'is_active': 1,
+        },
+        {
+          'id': 2,
+          'business_id': 1,
+          'category_id': 1,
+          'name': 'Toor Dal Premium 1kg',
+          'sku': 'DAL-TOOR-1KG',
+          'barcode': '8901234002',
+          'unit': 'KG',
+          'purchase_cost': 140.0,
+          'selling_price': 165.0,
+          'mrp': 175.0,
+          'tax_rate': 0.0,
+          'hsn_code': '0713',
+          'current_stock': 85.0,
+          'min_stock_threshold': 10.0,
+          'is_active': 1,
+        },
+        {
+          'id': 3,
+          'business_id': 1,
+          'category_id': 2,
+          'name': 'Gold Winner Sunflower Oil 1L',
+          'sku': 'OIL-GW-1L',
+          'barcode': '8901234003',
+          'unit': 'PKT',
+          'purchase_cost': 110.0,
+          'selling_price': 125.0,
+          'mrp': 135.0,
+          'tax_rate': 5.0,
+          'hsn_code': '1512',
+          'current_stock': 120.0,
+          'min_stock_threshold': 15.0,
+          'is_active': 1,
+        },
+        {
+          'id': 4,
+          'business_id': 1,
+          'category_id': 3,
+          'name': 'Tata Tea Gold 500g',
+          'sku': 'TEA-TATA-500',
+          'barcode': '8901234004',
+          'unit': 'PKT',
+          'purchase_cost': 210.0,
+          'selling_price': 240.0,
+          'mrp': 255.0,
+          'tax_rate': 5.0,
+          'hsn_code': '0902',
+          'current_stock': 60.0,
+          'min_stock_threshold': 8.0,
+          'is_active': 1,
+        },
+        {
+          'id': 5,
+          'business_id': 1,
+          'category_id': 4,
+          'name': 'Refined White Sugar 1kg',
+          'sku': 'SUGAR-1KG',
+          'barcode': '8901234005',
+          'unit': 'KG',
+          'purchase_cost': 38.0,
+          'selling_price': 44.0,
+          'mrp': 46.0,
+          'tax_rate': 5.0,
+          'hsn_code': '1701',
+          'current_stock': 200.0,
+          'min_stock_threshold': 20.0,
+          'is_active': 1,
+        },
+      ]);
+    }
+
+    final demoBiz = BusinessModel(
+      id: 1,
+      uuid: 'demo-shop-uuid',
+      name: 'Sri Murugan Maligai Store',
+      legalName: 'Sri Murugan Maligai Store',
+      businessType: 'grocery',
+      gstin: '33AAAAA0000A1Z5',
+      phone: '9876543210',
+      address: '12 Bazaar Street, Madurai',
+      city: 'Madurai',
+      state: 'Tamil Nadu',
+      stateCode: '33',
+      currency: 'INR',
+      taxType: 'gst',
+      invoicePrefix: 'INV-',
+      nextInvoiceNumber: 101,
+      receiptFooter: 'நன்றி! மீண்டும் வருக! / Thank You Visit Again!',
+      upiVpa: 'shop@okaxis',
+      upiName: 'Sri Murugan Maligai',
+      enableThermalLogo: true,
+      enableLowStockAlerts: true,
+      isActive: true,
+      userRole: 'owner',
+    );
+
+    await businessProvider.switchBusiness(demoBiz);
+    await productProvider.fetchProducts();
+
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+      );
+    }
+  }
+
+  void _showServerSettingsDialog() {
+    final client = ApiClient();
+    final urlCtrl = TextEditingController(text: client.baseUrl);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Server / API URL Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter your PC IP address (if on same Wi-Fi) or Live Hosting URL:',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: urlCtrl,
+              decoration: const InputDecoration(
+                labelText: 'API Base URL',
+                hintText: 'http://192.168.1.X/Shop/backend/public/api',
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Local PC Wi-Fi URL:\nhttp://10.73.28.195/Shop/backend/public/api',
+              style: TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () async {
+              client.setBaseUrl(urlCtrl.text.trim());
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('custom_api_url', urlCtrl.text.trim());
+              if (mounted) Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Server URL updated! Now try login.')),
+              );
+            },
+            child: const Text('Save URL'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: AppColors.primary),
+            tooltip: 'Server & Hosting Settings',
+            onPressed: _showServerSettingsDialog,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 10),
                 Center(
                   child: Container(
                     padding: const EdgeInsets.all(16),
@@ -141,7 +346,7 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                     child: const Icon(Icons.storefront_rounded, size: 48, color: AppColors.primary),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 const Center(
                   child: Text(
                     'KadaiKhata',
@@ -154,19 +359,18 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                     style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: TabBar(
                     controller: _tabController,
                     indicator: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
                     labelColor: Colors.white,
@@ -179,91 +383,114 @@ class _AuthScreenState extends State<AuthScreen> with SingleTickerProviderStateM
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
 
                 SizedBox(
-                  height: 480,
+                  height: 520,
                   child: TabBarView(
                     controller: _tabController,
                     children: [
                       // --- LOGIN TAB ---
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          TextField(
-                            controller: _loginEmailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              labelText: 'Email or Mobile Number',
-                              prefixIcon: Icon(Icons.person_outline),
+                      SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            TextField(
+                              controller: _loginEmailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                labelText: 'Email or Mobile Number',
+                                prefixIcon: Icon(Icons.person_outline),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          TextField(
-                            controller: _loginPasswordController,
-                            obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock_outline),
+                            const SizedBox(height: 14),
+                            TextField(
+                              controller: _loginPasswordController,
+                              obscureText: true,
+                              decoration: const InputDecoration(
+                                labelText: 'Password',
+                                prefixIcon: Icon(Icons.lock_outline),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Demo Password: password123')),
-                                );
-                              },
-                              child: const Text('Forgot Password?'),
+                            const SizedBox(height: 6),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Demo Password: password123')),
+                                  );
+                                },
+                                child: const Text('Forgot Password?'),
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: auth.isLoading ? null : _handleLogin,
-                            child: auth.isLoading
-                                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                : const Text('Login to Store'),
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: auth.isLoading ? null : _handleLogin,
+                              child: auth.isLoading
+                                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                  : const Text('Login to Store (Online)'),
                             ),
-                            child: Column(
-                              children: [
-                                const Text('Quick Demo Login:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    OutlinedButton(
-                                      onPressed: () {
-                                        _loginEmailController.text = 'shopowner@gmail.com';
-                                        _loginPasswordController.text = 'password123';
-                                        _handleLogin();
-                                      },
-                                      child: const Text('Owner Login', style: TextStyle(fontSize: 12)),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    OutlinedButton(
-                                      onPressed: () {
-                                        _loginEmailController.text = 'cashier@gmail.com';
-                                        _loginPasswordController.text = 'password123';
-                                        _handleLogin();
-                                      },
-                                      child: const Text('Cashier Login', style: TextStyle(fontSize: 12)),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            const SizedBox(height: 12),
+
+                            // --- OFFLINE DEMO BUTTON ---
+                            OutlinedButton.icon(
+                              onPressed: _handleOfflineMode,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                side: const BorderSide(color: AppColors.primary, width: 1.5),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              icon: const Icon(Icons.bolt, color: Colors.orange),
+                              label: const Text('Try Offline Mode (No Server Needed)',
+                                  style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                              ),
+                              child: Column(
+                                children: [
+                                  const Text('Quick Demo Login:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                  const SizedBox(height: 6),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      OutlinedButton(
+                                        onPressed: () {
+                                          _loginEmailController.text = 'shopowner@gmail.com';
+                                          _loginPasswordController.text = 'password123';
+                                          _handleLogin();
+                                        },
+                                        child: const Text('Owner Login', style: TextStyle(fontSize: 12)),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      OutlinedButton(
+                                        onPressed: () {
+                                          _loginEmailController.text = 'cashier@gmail.com';
+                                          _loginPasswordController.text = 'password123';
+                                          _handleLogin();
+                                        },
+                                        child: const Text('Cashier Login', style: TextStyle(fontSize: 12)),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  TextButton.icon(
+                                    onPressed: _showServerSettingsDialog,
+                                    icon: const Icon(Icons.settings_ethernet, size: 16),
+                                    label: const Text('Change Server / Hosting URL', style: TextStyle(fontSize: 11)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       // --- REGISTER TAB ---

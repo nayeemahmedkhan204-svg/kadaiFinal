@@ -3,7 +3,6 @@ class SupplierModel {
   final int businessId;
   final String name;
   final String? companyName;
-  final String? contactPerson;
   final String? phone;
   final String? email;
   final String? address;
@@ -18,7 +17,6 @@ class SupplierModel {
     required this.businessId,
     required this.name,
     this.companyName,
-    this.contactPerson,
     this.phone,
     this.email,
     this.address,
@@ -29,15 +27,12 @@ class SupplierModel {
     required this.isActive,
   });
 
-  double get outstandingBalance => currentBalance;
-
   factory SupplierModel.fromJson(Map<String, dynamic> json) {
     return SupplierModel(
       id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
       businessId: json['business_id'] is int ? json['business_id'] : int.parse(json['business_id'].toString()),
       name: json['name'] ?? '',
       companyName: json['company_name'],
-      contactPerson: json['contact_person'],
       phone: json['phone'],
       email: json['email'],
       address: json['address'],
@@ -54,7 +49,6 @@ class SupplierModel {
       'id': id,
       'name': name,
       'company_name': companyName,
-      'contact_person': contactPerson,
       'phone': phone,
       'email': email,
       'address': address,

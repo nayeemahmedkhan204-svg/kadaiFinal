@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/constants/app_colors.dart';
-import '../providers/business_provider.dart';
 import '../providers/product_provider.dart';
 import '../providers/sync_provider.dart';
 
@@ -17,29 +16,20 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final bizId = Provider.of<BusinessProvider>(context, listen: false).currentBusiness?.id;
-      if (bizId != null) {
-        Provider.of<SyncProvider>(context, listen: false).checkPending(bizId);
-      }
+      Provider.of<SyncProvider>(context, listen: false).checkPendingCount();
     });
   }
 
   void _triggerManualSync() async {
     final syncProv = Provider.of<SyncProvider>(context, listen: false);
-    final bizId = Provider.of<BusinessProvider>(context, listen: false).currentBusiness?.id;
-    if (bizId == null) return;
-    final before = syncProv.pendingCount;
-    final ok = await syncProv.syncNow(bizId);
-    final synced = before - syncProv.pendingCount;
+    final count = await syncProv.syncPendingInvoices();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(!ok
-              ? 'Sync failed. Please check your internet connection.'
-              : synced > 0
-                  ? 'Successfully synced $synced pending invoice(s) to cloud!'
-                  : 'All offline records are already synchronized with server.'),
-          backgroundColor: ok ? AppColors.success : AppColors.error,
+          content: Text(count > 0
+              ? 'Successfully synced $count pending invoice(s) to cloud!'
+              : 'All offline records are already synchronized with server.'),
+          backgroundColor: AppColors.success,
         ),
       );
     }

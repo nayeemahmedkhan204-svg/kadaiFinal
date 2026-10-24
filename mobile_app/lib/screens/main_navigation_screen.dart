@@ -57,7 +57,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     Navigator.pop(context); // Close drawer
     final authProv = Provider.of<AuthProvider>(context, listen: false);
     final bizProv = Provider.of<BusinessProvider>(context, listen: false);
-    final userBusinesses = authProv.businesses;
+    final userBusinesses = authProv.user?.businesses ?? [];
 
     showModalBottomSheet(
       context: context,

@@ -9,20 +9,6 @@ rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
 }
-
-// Force every plugin module to compile against SDK 34
-// (old plugins use compileSdk 30, which lacks android:attr/lStar).
-// This block MUST stay above evaluationDependsOn(':app').
-subprojects {
-    afterEvaluate { project ->
-        if (project.hasProperty('android')) {
-            project.android {
-                compileSdkVersion 34
-            }
-        }
-    }
-}
-
 subprojects {
     project.evaluationDependsOn(':app')
 }

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/constants/app_colors.dart';
+import '../models/business_model.dart';
+import '../models/cart_item_model.dart';
+import '../models/invoice_model.dart';
+import '../models/product_model.dart';
 import '../providers/business_provider.dart';
 import '../providers/printer_provider.dart';
 
@@ -22,46 +26,52 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
 
   void _printTestBill() async {
     final printerProv = Provider.of<PrinterProvider>(context, listen: false);
-    final biz = Provider.of<BusinessProvider>(context, listen: false).currentBusiness;
+    final biz = Provider.of<BusinessProvider>(context, listen: false).currentBusiness ??
+        BusinessModel(
+          id: 1,
+          name: 'KadaiKhata Store',
+          legalName: 'KadaiKhata Retail Pvt Ltd',
+          phone: '9876543210',
+          stateCode: '33',
+          upiId: 'shop@okaxis',
+          upiPayeeName: 'KadaiKhata Store',
+        );
 
-    final printData = <String, dynamic>{
-      'store_header': {
-        'name': biz?.name ?? 'KadaiKhata Store',
-        'address': biz?.address ?? '',
-        'phone': biz?.phone ?? '9876543210',
-        'gstin': biz?.gstin ?? '',
-      },
-      'invoice_meta': {
-        'invoice_number': 'TEST-0001',
-        'invoice_date': DateTime.now().toIso8601String().substring(0, 10),
-        'customer_name': 'Walk-in Customer',
-        'payment_method': 'cash',
-        'payment_status': 'paid',
-      },
-      'items': [
-        {
-          'name': 'Sample Tea Powder 500g',
-          'qty': 1,
-          'unit': 'PKT',
-          'price': 100.0,
-          'total': 100.0,
-        },
+    final dummyInvoice = InvoiceModel(
+      id: 0,
+      businessId: biz.id,
+      invoiceNumber: 'TEST-0001',
+      invoiceDate: DateTime.now().toIso8601String().substring(0, 10),
+      subtotal: 100.0,
+      discountAmount: 0.0,
+      taxableAmount: 95.24,
+      cgst: 2.38,
+      sgst: 2.38,
+      igst: 0.0,
+      totalTax: 4.76,
+      grandTotal: 100.0,
+      roundOff: 0.0,
+      paymentMethod: 'cash',
+      paymentStatus: 'paid',
+      paidAmount: 100.0,
+      balanceAmount: 0.0,
+      items: [
+        InvoiceItemModel(
+          id: 1,
+          invoiceId: 0,
+          productId: 1,
+          productName: 'Sample Tea Powder 500g',
+          quantity: 1,
+          unit: 'PKT',
+          unitPrice: 100.0,
+          taxRate: 5.0,
+          taxAmount: 4.76,
+          totalAmount: 100.0,
+        ),
       ],
-      'summary': {
-        'subtotal': 95.24,
-        'discount': 0.0,
-        'cgst': 2.38,
-        'sgst': 2.38,
-        'igst': 0.0,
-        'grand_total': 100.0,
-        'paid_amount': 100.0,
-        'balance_due': 0.0,
-      },
-      'upi_qr_payload': null,
-      'footer': biz?.receiptFooter ?? 'Thank you! Visit again.',
-    };
+    );
 
-    final ok = await printerProv.printBill(printData);
+    final ok = await printerProv.printReceipt(dummyInvoice, biz);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -121,8 +131,8 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          printerProv.connectedDevice != null
-                              ? '${printerProv.connectedDevice!.name} (${printerProv.connectedDevice!.address})'
+                          printerProv.selectedDevice != null
+                              ? '${printerProv.selectedDevice!.name} (${printerProv.selectedDevice!.address})'
                               : 'No Bluetooth device selected',
                           style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
                         ),
@@ -158,9 +168,9 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                             title: const Text('58mm (2 Inch)'),
                             subtitle: const Text('Handheld / Mobile POS'),
                             value: 58,
-                            groupValue: printerProv.paperSize,
+                            groupValue: printerProv.paperWidthMm,
                             onChanged: (val) {
-                              if (val != null) printerProv.setPaperSize(val);
+                              if (val != null) printerProv.setPaperWidth(val);
                             },
                           ),
                         ),
@@ -169,9 +179,9 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                             title: const Text('80mm (3 Inch)'),
                             subtitle: const Text('Desktop / Counter POS'),
                             value: 80,
-                            groupValue: printerProv.paperSize,
+                            groupValue: printerProv.paperWidthMm,
                             onChanged: (val) {
-                              if (val != null) printerProv.setPaperSize(val);
+                              if (val != null) printerProv.setPaperWidth(val);
                             },
                           ),
                         ),
@@ -237,7 +247,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
               )
             else
               ...printerProv.devices.map((device) {
-                final isCurrent = printerProv.connectedDevice?.address == device.address;
+                final isCurrent = printerProv.selectedDevice?.address == device.address;
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),

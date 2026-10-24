@@ -33,6 +33,10 @@ class ApiClient {
 
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
+    final customUrl = prefs.getString('custom_api_url');
+    if (customUrl != null && customUrl.isNotEmpty) {
+      _baseUrl = customUrl.endsWith('/') ? customUrl.substring(0, customUrl.length - 1) : customUrl;
+    }
     _authToken = prefs.getString(AppConstants.keyAuthToken);
     _activeBusinessId = prefs.getInt(AppConstants.keySelectedBusinessId);
   }

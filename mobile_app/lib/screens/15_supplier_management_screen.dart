@@ -311,7 +311,7 @@ class _SupplierManagementScreenState extends State<SupplierManagementScreen> {
                                         Text(sup.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                                         if (sup.contactPerson != null && sup.contactPerson!.isNotEmpty)
                                           Text('Contact: ${sup.contactPerson}', style: TextStyle(color: Colors.grey.shade700, fontSize: 12)),
-                                        Text(sup.phone ?? '', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                                        Text(sup.phone, style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
                                         if (sup.gstin != null && sup.gstin!.isNotEmpty)
                                           Text('GSTIN: ${sup.gstin}', style: TextStyle(color: Colors.grey.shade500, fontSize: 11)),
                                       ],

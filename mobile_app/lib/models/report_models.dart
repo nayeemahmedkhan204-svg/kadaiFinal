@@ -29,9 +29,6 @@ class DashboardMetrics {
     required this.lowStockCount,
   });
 
-  double get upiPayments => upiCollected;
-  double get totalExpenses => todayExpenses;
-
   factory DashboardMetrics.fromJson(Map<String, dynamic> json) {
     return DashboardMetrics(
       todaySales: (json['today_sales'] as num?)?.toDouble() ?? 0.0,

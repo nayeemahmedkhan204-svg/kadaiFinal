@@ -64,10 +64,6 @@ class SubscriptionModel {
   });
 
   bool get isValid => status == 'active' || status == 'trial';
-  String? get planName => plan?.name;
-  bool get isTrial => status == 'trial';
-  String? get trialEndsAt => expiresAt;
-  String? get endsAt => expiresAt;
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) {
     return SubscriptionModel(

@@ -196,7 +196,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                   );
                                 },
                                 title: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.between,
                                   children: [
                                     Text(
                                       inv.invoiceNumber,
@@ -226,7 +226,7 @@ class _SalesHistoryScreenState extends State<SalesHistoryScreen> {
                                     ),
                                     const SizedBox(height: 4),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.between,
                                       children: [
                                         Text(
                                           "${inv.invoiceDate} • ${inv.paymentMethod.toUpperCase()}",

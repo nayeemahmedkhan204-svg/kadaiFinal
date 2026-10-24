@@ -287,7 +287,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(cust.phone ?? '', style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+                                  Text(cust.phone, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
                                   if (cust.address != null && cust.address!.isNotEmpty)
                                     Text(cust.address!, maxLines: 1, overflow: TextOverflow.ellipsis,
                                         style: TextStyle(color: Colors.grey.shade500, fontSize: 11)),

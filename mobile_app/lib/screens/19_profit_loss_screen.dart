@@ -148,7 +148,7 @@ class _ProfitLossScreenState extends State<ProfitLossScreen> {
                             title: '1. Net Sales Revenue (Excl. Tax)',
                             subtitle: 'Gross revenue minus discounts & sales returns',
                             amount: netSales,
-                            color: Colors.black87,
+                            color: Colors.black800,
                             isBold: true,
                           ),
                           const SizedBox(height: 12),

@@ -3,7 +3,6 @@ class CategoryModel {
   final int businessId;
   final String name;
   final String? slug;
-  final String? description;
   final String color;
   final String icon;
   final int productsCount;
@@ -13,7 +12,6 @@ class CategoryModel {
     required this.businessId,
     required this.name,
     this.slug,
-    this.description,
     required this.color,
     required this.icon,
     this.productsCount = 0,
@@ -25,7 +23,6 @@ class CategoryModel {
       businessId: json['business_id'] is int ? json['business_id'] : int.parse(json['business_id'].toString()),
       name: json['name'] ?? '',
       slug: json['slug'],
-      description: json['description'],
       color: json['color'] ?? '#1E88E5',
       icon: json['icon'] ?? 'category',
       productsCount: json['products_count'] ?? 0,
@@ -38,7 +35,6 @@ class CategoryModel {
       'business_id': businessId,
       'name': name,
       'slug': slug,
-      'description': description,
       'color': color,
       'icon': icon,
     };

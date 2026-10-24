@@ -423,7 +423,7 @@ class _CartBottomSheet extends StatelessWidget {
               border: Border(bottom: BorderSide(color: AppColors.border)),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.between,
               children: [
                 Text("Shopping Cart (${pos.itemCount} items)",
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -488,17 +488,17 @@ class _CartBottomSheet extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.between, children: [
                   const Text('Subtotal:'),
                   Text("₹${pos.subtotal.toStringAsFixed(2)}"),
                 ]),
                 const SizedBox(height: 4),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.between, children: [
                   const Text('GST Tax:'),
                   Text("₹${pos.totalTax.toStringAsFixed(2)}"),
                 ]),
                 const Divider(),
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.between, children: [
                   const Text('Grand Total:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                   Text("₹${pos.grandTotal.toStringAsFixed(2)}",
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.primary)),
@@ -528,7 +528,7 @@ class _CustomerPickerSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.between,
             children: [
               const Text('Select Customer / Khata', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
@@ -599,7 +599,7 @@ class _CheckoutModalSheet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.between,
             children: [
               const Text('Select Payment Method', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
@@ -613,7 +613,7 @@ class _CheckoutModalSheet extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.between,
               children: [
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Text('Customer', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
